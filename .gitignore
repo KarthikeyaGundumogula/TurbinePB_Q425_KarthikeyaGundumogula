@@ -1,0 +1,63 @@
+# Git ignore for a Rust workspace with multiple crates
+
+# Cargo / build
+/target/
+**/target/
+**/Cargo.lock    # uncomment if you want to ignore Cargo.lock for libraries
+
+# Rust build artefacts
+*.rlib
+*.rmeta
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.a
+*.lib
+
+# Rust incremental / fingerprint / build caches
+**/incremental/
+**/.fingerprint/
+**/.cargo/registry/
+**/.cargo/git/
+
+# wasm-pack output
+/pkg/
+
+# Generated docs
+/target/doc/
+**/target/doc/
+doc/
+docs/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
+.project
+.metadata
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+
+# Test / coverage
+coverage/
+*.profraw
+*.profdata
+
+# Misc
+dist/
+build/
+node_modules/
+
+# Keep local config out
+local.toml
