@@ -61,3 +61,14 @@ node_modules/
 
 # Keep local config out
 local.toml
+
+# Anchor specific ignores
+.anchor
+**/target
+**/.crates.toml
+test-ledger
+.DS_Store
+node_modules
+dist
+build
+*.prettierignore
