@@ -4,7 +4,7 @@ declare_id!("5oPatdoYFYVUknLwTfy2jEZfZ9cvGHkSXdxRPs2EKCpG");
 
 #[program]
 pub mod counter_solana {
-   use super::*;
+    use super::*;
 
     pub fn initialize_counter(
         ctx: Context<InitializeCounter>,
@@ -12,6 +12,7 @@ pub mod counter_solana {
         min_value: u64,
     ) -> Result<()> {
         let counter = &mut ctx.accounts.counter;
+        require_gt!(max_value, min_value, CounterError::InvalidArguments);
         counter.count = min_value;
         counter.max_value = max_value;
         counter.min_value = min_value;
@@ -22,6 +23,7 @@ pub mod counter_solana {
     pub fn increment(ctx: Context<Operate>) -> Result<()> {
         let counter = &mut ctx.accounts.counter;
         counter.count = counter.count.checked_add(1).unwrap();
+        require_gt!(counter.max_value, 0, CounterError::NotInitializedError);
         require_gt!(
             counter.max_value,
             counter.count,
@@ -34,6 +36,7 @@ pub mod counter_solana {
     pub fn decrement(ctx: Context<Operate>) -> Result<()> {
         let counter = &mut ctx.accounts.counter;
         counter.count = counter.count.checked_sub(1).unwrap();
+        require_gt!(counter.max_value, 0, CounterError::NotInitializedError);
         require_gte!(
             counter.count,
             counter.min_value,
@@ -41,6 +44,13 @@ pub mod counter_solana {
         );
         let payer = &ctx.accounts.signer.key();
         msg!("{:?}'s Counter: {:?}", payer, counter.count);
+        Ok(())
+    }
+
+    pub fn reset(ctx: Context<Operate>) -> Result<()> {
+        let counter = &mut ctx.accounts.counter;
+        counter.count = counter.min_value;
+        msg!("Counter reset");
         Ok(())
     }
 }
@@ -63,7 +73,10 @@ pub struct InitializeCounter<'info> {
 
 #[derive(Accounts)]
 pub struct Operate<'info> {
-    #[account(mut)]
+    #[account(mut,
+    seeds = [b"Counter",signer.key().as_ref()],
+    bump,
+    )]
     pub counter: Account<'info, Counter>,
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -79,8 +92,12 @@ pub struct Counter {
 
 #[error_code]
 pub enum CounterError {
+    #[msg("Counter is not yet initialized")]
+    NotInitializedError,
     #[msg("Counter at its maximum")]
     MaxValueError,
     #[msg("Counter at its minimum")]
     MinValueError,
+    #[msg("Arguments are not valid")]
+    InvalidArguments,
 }

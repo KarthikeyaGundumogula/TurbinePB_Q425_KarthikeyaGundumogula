@@ -9,7 +9,7 @@ describe("counter_solana", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.counterSolana as Program<CounterSolana>;
-    const user = anchor.web3.Keypair.generate();
+  const user = anchor.web3.Keypair.generate();
   let counterPDA: anchor.web3.PublicKey;
 
   before(async () => {
@@ -36,16 +36,34 @@ describe("counter_solana", () => {
 
   it("Increment Counter", async () => {
     let oldCounter = await program.account.counter.fetch(counterPDA);
-    await program.methods.increment().accounts({ counter: counterPDA }).rpc();
+    await program.methods
+      .increment()
+      .accounts({ counter: counterPDA, signer: user.publicKey } as any)
+      .signers([user])
+      .rpc();
     let newCounter = await program.account.counter.fetch(counterPDA);
     assert.equal(newCounter.count.toNumber(), oldCounter.count.toNumber() + 1);
   });
 
   it("Decrement Counter", async () => {
     let oldCounter = await program.account.counter.fetch(counterPDA);
-    await program.methods.decrement().accounts({ counter: counterPDA }).rpc();
+    await program.methods
+      .decrement()
+      .accounts({ counter: counterPDA, signer: user.publicKey } as any)
+      .signers([user])
+      .rpc();
     let newCounter = await program.account.counter.fetch(counterPDA);
     assert.equal(newCounter.count.toNumber(), oldCounter.count.toNumber() - 1);
+  });
+
+  it("Reset Counter", async () => {
+    await program.methods
+      .reset()
+      .accounts({ counter: counterPDA, signer: user.publicKey } as any)
+      .signers([user])
+      .rpc();
+    let newCounter = await program.account.counter.fetch(counterPDA);
+    assert.equal(newCounter.count.toNumber(), min_value.toNumber());
   });
 
   const getAirdrop = async (user: anchor.web3.PublicKey) => {
