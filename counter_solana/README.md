@@ -17,6 +17,11 @@ D-R-T provides a robust solution for managing reward points in decentralized app
 
 ### Architecture
 
+![Simple User Guide](images/Simple%20DePIN%20Architecture.jpg)
+
+**Technical Details**
+![Technical Architecture](<images/DePIN%20Rewards%20Technical%20Architecture%20(1).jpg>)
+
 ### User Stories
 
 **Initialization:**
@@ -36,3 +41,13 @@ D-R-T provides a robust solution for managing reward points in decentralized app
 - As a signer when I increment above maximum value, the transaction fails with "Counter at its maximum"
 - As a signer when I decrement below minimum value, the transaction fails with "Counter at its minimum"
 
+
+### Quick Set-Up
+
+```bash
+git clone https://github.com/KarthikeyaGundumogula/TurbinePB_Q425_KarthikeyaGundumogula.git
+cd TurbinePB_Q425_KarthikeyaGundumogula/counter_solana
+npm i
+anchor build
+anchor test
+```
