@@ -27,7 +27,7 @@ pub mod counter_solana {
         require_gt!(counter.max_value, 0, CounterError::NotInitializedError);
         
         // Check bounds BEFORE updating the counter
-        require_gt!(
+        require_gte!(
             counter.max_value,
             counter.count,
             CounterError::MaxValueError
