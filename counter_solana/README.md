@@ -15,11 +15,12 @@ D-R-T provides a robust solution for managing reward points in decentralized app
 - 🎯 Atomic point operations (increment/decrement)
 - 🎯 Safe point resets to minimum value
 
-### Architecture
+## Architecture
 
 ![Simple User Guide](images/Simple%20DePIN%20Architecture.jpg)
 
 **Technical Details**
+
 ![Technical Architecture](<images/DePIN%20Rewards%20Technical%20Architecture%20(1).jpg>)
 
 ### User Stories
