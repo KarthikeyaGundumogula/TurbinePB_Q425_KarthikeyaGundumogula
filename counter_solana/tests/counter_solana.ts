@@ -10,11 +10,15 @@ describe("counter_solana", () => {
 
   const program = anchor.workspace.counterSolana as Program<CounterSolana>;
   const user = anchor.web3.Keypair.generate();
+  const user1 = anchor.web3.Keypair.generate();
   let counterPDA: anchor.web3.PublicKey;
+  let counterPDA1: anchor.web3.PublicKey;
 
   before(async () => {
     await getAirdrop(user.publicKey);
+    await getAirdrop(user1.publicKey);
     [counterPDA] = getPDA(user.publicKey, program.programId);
+    [counterPDA1] = getPDA(user1.publicKey, program.programId);
   });
   let max_value = new anchor.BN(100);
   let min_value = new anchor.BN(10);
@@ -43,6 +47,34 @@ describe("counter_solana", () => {
       .rpc();
     let newCounter = await program.account.counter.fetch(counterPDA);
     assert.equal(newCounter.count.toNumber(), oldCounter.count.toNumber() + 1);
+  });
+
+  it("does not increment counter above max value", async () => {
+    let max_value1 = new anchor.BN(10);
+    let min_value1 = new anchor.BN(9);
+    await program.methods
+      .initializeCounter(max_value1, min_value1)
+      .accounts({
+        payer: user1.publicKey,
+        counter: counterPDA1,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      } as any)
+      .signers([user1])
+      .rpc();
+
+    const counterAccount = await program.account.counter.fetch(counterPDA1);
+    assert.equal(counterAccount.count.toNumber(), 9);
+
+    // Now increment user1's counter using the correct PDA
+    await program.methods
+      .increment()
+      .accounts({ counter: counterPDA1, signer: user1.publicKey } as any)
+      .signers([user1])
+      .rpc();
+    let newCounter = await program.account.counter.fetch(counterPDA1);
+    assert.equal(newCounter.count.toNumber(), min_value1.toNumber() + 1);
+
+    console.log("newCounter: ", newCounter.count.toNumber());
   });
 
   it("Decrement Counter", async () => {
