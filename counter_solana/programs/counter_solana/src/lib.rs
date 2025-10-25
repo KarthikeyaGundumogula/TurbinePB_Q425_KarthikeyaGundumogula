@@ -25,6 +25,7 @@ pub mod counter_solana {
         
         // Check if counter is initialized
         require_gt!(counter.max_value, 0, CounterError::NotInitializedError);
+        counter.count = counter.count.checked_add(1).ok_or(CounterError::MaxValueError)?;
         
         // Check bounds BEFORE updating the counter
         require_gte!(
@@ -34,8 +35,6 @@ pub mod counter_solana {
         );
         
         // Safe increment with overflow protection
-        counter.count = counter.count.checked_add(1)
-            .ok_or(CounterError::MaxValueError)?;
         
         let payer = &ctx.accounts.signer.key();
         msg!("{:?}'s Counter: {:?}", payer, counter.count);
@@ -47,16 +46,16 @@ pub mod counter_solana {
         // Check if counter is initialized
         require_gt!(counter.max_value, 0, CounterError::NotInitializedError);
         
+        // Safe decrement with underflow protection
+        counter.count = counter.count.checked_sub(1)
+            .ok_or(CounterError::MinValueError)?;
+        
         // Check bounds BEFORE updating the counter
         require_gte!(
             counter.count,
             counter.min_value,
             CounterError::MinValueError
         );
-        
-        // Safe decrement with underflow protection
-        counter.count = counter.count.checked_sub(1)
-            .ok_or(CounterError::MinValueError)?;
         
         let payer = &ctx.accounts.signer.key();
         msg!("{:?}'s Counter: {:?}", payer, counter.count);

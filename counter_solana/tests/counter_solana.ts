@@ -73,8 +73,6 @@ describe("counter_solana", () => {
       .rpc();
     let newCounter = await program.account.counter.fetch(counterPDA1);
     assert.equal(newCounter.count.toNumber(), min_value1.toNumber() + 1);
-
-    console.log("newCounter: ", newCounter.count.toNumber());
   });
 
   it("Decrement Counter", async () => {
